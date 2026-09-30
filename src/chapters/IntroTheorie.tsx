@@ -6,10 +6,15 @@ import { quizzes } from "../data/chapters";
 export default function IntroTheorie() {
   return (
     <div className="fade-in space-y-10">
+      <div>
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold mb-3" style={{ background: "var(--accent-light)", color: "var(--accent)" }}>
+          📅 Séance S3 • 3h • Service Web & HTTP(S) — après S1-S2 réseaux
+        </div>
       <h1 className="text-3xl font-extrabold mb-2">📖 Introduction Théorique</h1>
       <p style={{ color: "var(--text-secondary)" }}>
         Avant de coder, comprenons comment fonctionne Internet et le Web. Ces bases sont essentielles pour devenir un bon développeur.
       </p>
+      </div>
 
       {/* Internet */}
       <section id="internet">
@@ -317,6 +322,38 @@ SELECT nom, prenom, email
 FROM etudiants 
 WHERE filiere = 'Informatique';`}
         />
+      </section>
+
+      {/* Complément S3 : URL, méthodes, codes, cookies */}
+      <section id="url-methodes">
+        <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">🔗 URL, méthodes HTTP, codes & cookies (S3)</h2>
+        <CodeBlock
+          language="bash"
+          filename="Anatomie d'une URL"
+          code={`https://monsite.com:443/cours/reseaux?chap=osi#section2
+protocole=https | domaine=monsite.com | port=443
+chemin=/cours/reseaux | query=chap=osi | ancre=section2`}
+        />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+          <div className="p-4 rounded-xl" style={{ background: "var(--bg-secondary)", border: "1px solid var(--border-color)" }}>
+            <h4 className="font-bold mb-2">📮 Méthodes HTTP</h4>
+            <ul className="text-sm space-y-1" style={{ color: "var(--text-secondary)" }}>
+              <li>• <strong>GET</strong> : lire (recherche, page) — visible dans l'URL</li>
+              <li>• <strong>POST</strong> : créer (inscription) — corps caché</li>
+              <li>• <strong>PUT/PATCH</strong> : modifier — <strong>DELETE</strong> : supprimer</li>
+            </ul>
+          </div>
+          <div className="p-4 rounded-xl" style={{ background: "var(--bg-secondary)", border: "1px solid var(--border-color)" }}>
+            <h4 className="font-bold mb-2">🚦 Codes statut</h4>
+            <ul className="text-sm space-y-1" style={{ color: "var(--text-secondary)" }}>
+              <li>• <strong>200</strong> OK • <strong>301</strong> redirigé • <strong>404</strong> introuvable • <strong>500</strong> erreur serveur</li>
+              <li>• Retiens : 2xx succès, 3xx redirection, 4xx erreur client, 5xx erreur serveur</li>
+            </ul>
+          </div>
+        </div>
+        <InfoBox type="info" title="🍪 Cookies & sessions (pont vers S5)">
+          <p>HTTP est sans mémoire : un <strong>cookie de session</strong> reconnaît l'utilisateur entre 2 pages. Volé via XSS → usurpation (voir S5 Sécurité). DNS : <code>monsite.com</code> → IP via cache → FAI → racine → TLD → serveur autoritatif (détail S1-S2).</p>
+        </InfoBox>
       </section>
 
       {/* Quiz */}

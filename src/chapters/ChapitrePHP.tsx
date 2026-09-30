@@ -6,10 +6,15 @@ import { quizzes } from "../data/chapters";
 export default function ChapitrePHP() {
   return (
     <div className="fade-in space-y-10">
+      <div>
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold mb-3" style={{ background: "var(--accent-light)", color: "var(--accent)" }}>
+          📅 Séance S10 • 3h • Livrable : traitement.php + connexion PDO
+        </div>
       <h1 className="text-3xl font-extrabold mb-2">🐘 PHP – Logique serveur</h1>
       <p style={{ color: "var(--text-secondary)" }}>
         PHP (PHP: Hypertext Preprocessor) est un langage qui s'exécute côté serveur. Il permet de traiter les données des formulaires, communiquer avec la base de données, et générer des pages HTML dynamiques.
       </p>
+      </div>
 
       <InfoBox type="info">
         <p>Les fichiers PHP doivent être placés dans <code>C:\xampp\htdocs\</code> et avoir l'extension <code>.php</code>. Ils sont exécutés par le serveur Apache.</p>

@@ -4,13 +4,25 @@ import InfoBox from "../components/InfoBox";
 export default function InstallXampp() {
   return (
     <div className="fade-in space-y-10">
+      <div>
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold mb-3" style={{ background: "var(--accent-light)", color: "var(--accent)" }}>
+          📅 Séance S6 • 3h • Livrable : http://localhost OK + phpMyAdmin
+        </div>
       <h1 className="text-3xl font-extrabold mb-2">⚙️ Installation de XAMPP</h1>
       <p style={{ color: "var(--text-secondary)" }}>
         XAMPP est un logiciel gratuit qui installe un serveur web complet (Apache + PHP + MySQL) sur votre ordinateur. C'est l'outil indispensable pour développer en local.
       </p>
+      </div>
 
       <InfoBox type="info" title="ℹ️ Pourquoi XAMPP ?">
         <p>XAMPP transforme votre ordinateur en serveur web local. Vous pourrez développer et tester vos sites web sans avoir besoin d'Internet ni d'hébergeur.</p>
+      </InfoBox>
+
+      <InfoBox type="warning" title="⚠️ Site statique vs TP local — À comprendre">
+        <p>
+          Le site que vous lisez (GitHub Pages) est <strong>100% statique</strong> : il ne peut pas exécuter PHP ni héberger MySQL.<br />
+          Les TP PHP/MySQL se font <strong>uniquement en local avec XAMPP</strong> : fichiers dans <code>C:\xampp\htdocs</code>, test sur <code>http://localhost</code>.
+        </p>
       </InfoBox>
 
       {/* XAMPP = */}
@@ -222,6 +234,15 @@ export default function InstallXampp() {
 
         <InfoBox type="info">
           <p>Pour accéder à votre projet dans le navigateur : <code>http://localhost/mon-projet/</code></p>
+        </InfoBox>
+
+        <InfoBox type="tip" title="💻 Mac & Linux — chemins htdocs">
+          <p>
+            <strong>Windows :</strong> <code>C:\xampp\htdocs</code> •
+            <strong> macOS :</strong> <code>/Applications/XAMPP/htdocs</code> •
+            <strong> Linux :</strong> <code>/opt/lampp/htdocs</code> (lancer avec <code>sudo /opt/lampp/lampp start</code>).<br />
+            Si Apache ne démarre pas (port 80 occupé par Skype/antivirus) : quittez Skype ou passez Apache sur 8080 puis ouvrez <code>http://localhost:8080</code>.
+          </p>
         </InfoBox>
 
         <CodeBlock

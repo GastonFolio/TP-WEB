@@ -6,10 +6,15 @@ import { quizzes } from "../data/chapters";
 export default function ChapitreCSS() {
   return (
     <div className="fade-in space-y-10">
+      <div>
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold mb-3" style={{ background: "var(--accent-light)", color: "var(--accent)" }}>
+          📅 Séance S8 • 3h • Livrable : page stylée responsive
+        </div>
       <h1 className="text-3xl font-extrabold mb-2">🎨 CSS3 – Design & mise en page</h1>
       <p style={{ color: "var(--text-secondary)" }}>
         CSS (Cascading Style Sheets) permet de styliser vos pages HTML : couleurs, tailles, positions, animations... C'est l'habillage visuel de votre site.
       </p>
+      </div>
 
       <InfoBox type="tip" title="💡 Analogie">
         <p>Si HTML est le squelette de la maison, CSS est la peinture, la décoration et l'aménagement intérieur.</p>

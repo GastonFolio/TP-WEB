@@ -6,10 +6,15 @@ import { quizzes } from "../data/chapters";
 export default function ChapitreHTML() {
   return (
     <div className="fade-in space-y-10">
+      <div>
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold mb-3" style={{ background: "var(--accent-light)", color: "var(--accent)" }}>
+          📅 Séance S7 • 3h • Livrable : page inscription statique
+        </div>
       <h1 className="text-3xl font-extrabold mb-2">🌐 HTML5 – Structure des pages web</h1>
       <p style={{ color: "var(--text-secondary)" }}>
         HTML (HyperText Markup Language) est le langage qui structure le contenu de vos pages web. C'est le squelette de tout site internet.
       </p>
+      </div>
 
       <InfoBox type="tip" title="💡 Analogie">
         <p>Si un site web était une maison, HTML serait les murs, le toit et la charpente – la structure de base.</p>

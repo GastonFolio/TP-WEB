@@ -1,4 +1,5 @@
 import { BookOpen, Code, Database, Globe, Monitor, Server, Rocket, CheckCircle } from "lucide-react";
+import InfoBox from "../components/InfoBox";
 
 export default function Accueil() {
   const techs = [
@@ -37,6 +38,14 @@ export default function Accueil() {
           Du navigateur à la base de données, maîtrisez toute la chaîne du développement web.
         </p>
       </div>
+
+      <InfoBox type="warning" title="⚠️ Important — Comment utiliser ce site (GitHub Pages)">
+        <p>
+          <strong>Ce site est un support de cours statique</strong> : il ne fait pas tourner PHP ni MySQL en ligne.<br />
+          <strong>Tu lis ici, tu pratiques en local :</strong> installe XAMPP, code dans <code>C:\xampp\htdocs</code> (ou équivalent Mac/Linux),
+          puis teste sur <code>http://localhost</code>. Voir chapitre « Installation XAMPP ».
+        </p>
+      </InfoBox>
 
       {/* Result Preview */}
       <div className="mb-12 p-6 rounded-2xl" style={{ background: "var(--bg-secondary)", border: "1px solid var(--border-color)" }}>
@@ -84,6 +93,45 @@ export default function Accueil() {
             <span className="font-medium pt-1">{obj}</span>
           </div>
         ))}
+      </div>
+
+      {/* Planning 12 séances */}
+      <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
+        <BookOpen size={24} style={{ color: "var(--accent)" }} />
+        📅 Planning — 12 séances × 3h = 36h
+      </h2>
+      <div className="overflow-x-auto mb-12">
+        <table className="w-full text-sm rounded-xl overflow-hidden" style={{ border: "1px solid var(--border-color)" }}>
+          <thead>
+            <tr style={{ background: "var(--accent)", color: "white" }}>
+              <th className="p-3 text-left">Séance</th>
+              <th className="p-3 text-left">Titre</th>
+              <th className="p-3 text-left">Livrable</th>
+            </tr>
+          </thead>
+          <tbody>
+            {[
+              ["S1–S2", "🛰️ Réseaux, OSI & TCP/IP", "Schéma OSI + TP ping/tracert"],
+              ["S3", "📖 Service Web & HTTP(S)", "Analyse URL + QCM"],
+              ["S4", "🧊 Surface / Deep / Dark Web", "Exposé 5 min"],
+              ["S5", "🔒 Attaques & défenses", "Audit CRUD + checklist"],
+              ["S6", "⚙️ XAMPP local", "http://localhost OK"],
+              ["S7", "🌐 HTML5", "Page inscription"],
+              ["S8", "🎨 CSS3", "Page responsive"],
+              ["S9", "⚡ JavaScript", "Formulaire validé"],
+              ["S10", "🐘 PHP", "traitement.php + PDO"],
+              ["S11", "🗄️ MySQL", "BDD 5 lignes + export"],
+              ["S12", "🚀 Projet CRUD + soutenance", "App complète notée"],
+            ].map((r, i) => (
+              <tr key={i} style={{ background: i % 2 === 0 ? "var(--bg-secondary)" : undefined }}>
+                <td className="p-3 font-bold whitespace-nowrap">{r[0]}</td>
+                <td className="p-3">{r[1]}</td>
+                <td className="p-3" style={{ color: "var(--text-secondary)" }}>{r[2]}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <p className="text-xs mt-2" style={{ color: "var(--text-secondary)" }}>1 séance = 1h cours + 1h démo guidée + 1h autonomie + mini-quiz. PHP/MySQL = TP en local XAMPP uniquement.</p>
       </div>
 
       {/* Prérequis */}

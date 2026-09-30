@@ -1,0 +1,16 @@
+# Dépendances & build (ne jamais pusher)
+node_modules/
+dist/
+
+# Fichiers de pilotage enseignant (local uniquement — NE PAS UPLOADER sur GitHub)
+AUDIT-ET-RECOMMANDATIONS.md
+PLAN-AMELIORATION.md
+
+# Système & éditeurs
+.DS_Store
+Thumbs.db
+*.log
+.vscode/
+.idea/
+*.tmp
+.ssr-*.mjs

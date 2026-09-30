@@ -6,10 +6,15 @@ import { quizzes } from "../data/chapters";
 export default function ChapitreJS() {
   return (
     <div className="fade-in space-y-10">
+      <div>
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold mb-3" style={{ background: "var(--accent-light)", color: "var(--accent)" }}>
+          📅 Séance S9 • 3h • Livrable : formulaire validé + fetch API
+        </div>
       <h1 className="text-3xl font-extrabold mb-2">⚡ JavaScript – Interactivité</h1>
       <p style={{ color: "var(--text-secondary)" }}>
         JavaScript est le langage qui rend vos pages web interactives. Il s'exécute directement dans le navigateur et permet de réagir aux actions de l'utilisateur.
       </p>
+      </div>
 
       <InfoBox type="tip" title="💡 Analogie">
         <p>HTML = squelette, CSS = vêtements, JavaScript = le cerveau et les muscles qui font bouger le corps !</p>
@@ -261,6 +266,29 @@ champRecherche.addEventListener("input", function() {
             ))}
           </div>
         </div>
+      </section>
+
+      {/* fetch API (S9 bonus) */}
+      <section id="fetch">
+        <h2 className="text-2xl font-bold mb-4">🌐 fetch — Appeler une API (bonus S9)</h2>
+        <p className="mb-4" style={{ color: "var(--text-secondary)" }}>
+          <code>fetch()</code> récupère des données sans recharger la page (ex. recherche d'étudiants en direct). C'est le pont vers les applis modernes.
+        </p>
+        <CodeBlock
+          language="javascript"
+          filename="fetch.js — exemple"
+          code={`// Récupérer des données JSON (ex. liste depuis PHP)
+fetch('api-etudiants.php')
+  .then(reponse => reponse.json())
+  .then(etudiants => {
+    console.log(etudiants.length + ' étudiants reçus');
+    etudiants.forEach(e => console.log(e.nom));
+  })
+  .catch(erreur => console.error('Erreur réseau :', erreur));`}
+        />
+        <InfoBox type="info">
+          <p>En S12 bonus : créez <code>api-etudiants.php</code> qui renvoie <code>json_encode($etudiants)</code> et affichez la recherche instantanée avec ce <code>fetch</code>.</p>
+        </InfoBox>
       </section>
 
       {/* Exercice */}

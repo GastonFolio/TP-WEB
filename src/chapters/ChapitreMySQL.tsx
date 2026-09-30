@@ -6,10 +6,15 @@ import { quizzes } from "../data/chapters";
 export default function ChapitreMySQL() {
   return (
     <div className="fade-in space-y-10">
+      <div>
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold mb-3" style={{ background: "var(--accent-light)", color: "var(--accent)" }}>
+          📅 Séance S11 • 3h • Livrable : BDD gestion_etudiants + jointure + export
+        </div>
       <h1 className="text-3xl font-extrabold mb-2">🗄️ MySQL – Base de données</h1>
       <p style={{ color: "var(--text-secondary)" }}>
         MySQL est un système de gestion de base de données relationnelle. Il permet de stocker, organiser et retrouver les données de votre application.
       </p>
+      </div>
 
       <InfoBox type="tip" title="💡 Analogie">
         <p>MySQL, c'est un grand classeur bien organisé : les <strong>bases de données</strong> sont les classeurs, les <strong>tables</strong> sont les tiroirs, les <strong>lignes</strong> sont les fiches, et les <strong>colonnes</strong> sont les champs sur chaque fiche.</p>
@@ -198,6 +203,31 @@ DELETE FROM etudiants WHERE filiere = 'Gestion';
 
         <InfoBox type="error" title="❌ DANGER">
           <p>Un <code>DELETE</code> sans <code>WHERE</code> supprime <strong>TOUTES</strong> les données de la table ! Vérifiez toujours votre requête avant de l'exécuter.</p>
+        </InfoBox>
+      </section>
+
+      {/* Jointure + contraintes + export (S11) */}
+      <section id="jointure-export">
+        <h2 className="text-2xl font-bold mb-4">🔗 Jointure, contraintes & export (S11)</h2>
+        <CodeBlock
+          language="sql"
+          filename="Jointure + export"
+          code={`-- Table des filières + jointure
+CREATE TABLE IF NOT EXISTS filieres (
+  code VARCHAR(10) PRIMARY KEY,
+  nom VARCHAR(100) NOT NULL
+);
+
+-- Compter les étudiants par filière
+SELECT filiere, COUNT(*) AS total
+FROM etudiants
+GROUP BY filiere;
+
+-- Export sauvegarde : phpMyAdmin > Exporter > SQL
+-- Ou : mysqldump -u root gestion_etudiants > sauvegarde.sql`}
+        />
+        <InfoBox type="tip" title="💡 Contraintes à connaître">
+          <p><code>PRIMARY KEY</code> (unique), <code>UNIQUE(email)</code> (déjà dans le projet), <code>NOT NULL</code>, <code>FOREIGN KEY</code> (lien entre tables). Elles protègent l'intégrité (pilier I de la triade CIA, voir S5).</p>
         </InfoBox>
       </section>
 

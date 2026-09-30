@@ -4,10 +4,22 @@ import InfoBox from "../components/InfoBox";
 export default function ProjetFinal() {
   return (
     <div className="fade-in space-y-10">
+      <div>
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold mb-3" style={{ background: "var(--accent-light)", color: "var(--accent)" }}>
+          📅 Séance S12 • 3h • Évaluation : CRUD complet + soutenance
+        </div>
       <h1 className="text-3xl font-extrabold mb-2">🚀 Projet Final – Gestion d'Étudiants</h1>
       <p style={{ color: "var(--text-secondary)" }}>
         Nous allons maintenant créer une application web complète de gestion d'étudiants, étape par étape. Cette application permet d'ajouter, afficher, modifier et supprimer des étudiants (CRUD).
       </p>
+      </div>
+
+      <InfoBox type="warning" title="⚠️ Où tester ce projet ? (Local uniquement)">
+        <p>
+          Ce projet <strong>ne fonctionnera pas sur le lien GitHub Pages</strong> : GitHub Pages ne gère ni PHP ni MySQL.<br />
+          Réalisez-le dans <code>C:\xampp\htdocs\gestion-etudiants\</code> avec Apache + MySQL démarrés, puis ouvrez <code>http://localhost/gestion-etudiants/</code>.
+        </p>
+      </InfoBox>
 
       <div className="p-5 rounded-2xl" style={{ background: "var(--bg-secondary)", border: "1px solid var(--border-color)" }}>
         <h3 className="font-bold mb-3">📋 Fonctionnalités de l'application :</h3>
@@ -66,7 +78,8 @@ export default function ProjetFinal() {
         </div>
 
         <p className="mb-4" style={{ color: "var(--text-secondary)" }}>
-          Ouvrez <code>http://localhost/phpmyadmin</code> et exécutez ce SQL dans l'onglet "SQL" :
+          Ouvrez <code>http://localhost/phpmyadmin</code> et exécutez ce SQL dans l'onglet "SQL" — ou importez directement le fichier
+          {" "}<a href={`${import.meta.env.BASE_URL}database.sql`} download className="font-bold underline" style={{ color: "var(--accent)" }}>📥 database.sql</a> (onglet Importer).
         </p>
 
         <CodeBlock
@@ -540,6 +553,10 @@ exit;
 ?>`}
         />
 
+        <InfoBox type="warning" title="⚠️ Simplification volontaire (voir S5 Sécurité)">
+          <p>La suppression en <code>GET</code> (<code>supprimer.php?id=…</code>) est pratique pour le TP mais vulnérable au <strong>CSRF</strong> : un lien piégé peut supprimer. En S12 bonus : passez en <code>POST</code> + token CSRF + <code>$_SESSION</code> (exemple complet en S5).</p>
+        </InfoBox>
+
         <h3 className="font-bold text-lg mb-2 mt-8">style.css :</h3>
         <CodeBlock
           language="css"
@@ -810,6 +827,280 @@ document.addEventListener('DOMContentLoaded', function() {
         />
       </section>
 
+      {/* Étape 9 */}
+      <section id="etape9">
+        <div className="flex items-start gap-4 mb-4">
+          <div className="step-number">9</div>
+          <div>
+            <h2 className="text-2xl font-bold">Recherche + pagination (niveau pro)</h2>
+            <p style={{ color: "var(--text-secondary)" }}>Indispensable dès 50 étudiants : filtrer et paginer</p>
+          </div>
+        </div>
+        <p className="mb-4" style={{ color: "var(--text-secondary)" }}>
+          Sans recherche, ton app est inutilisable en vrai. Ajoute en haut de <code>index.php</code> : un champ <code>?q=marie</code> (LIKE) + pages de 5 lignes (LIMIT/OFFSET).
+        </p>
+        <CodeBlock
+          language="php"
+          filename="index.php — bloc recherche + pagination à ajouter"
+          code={`<?php
+require_once 'connexion.php';
+
+// --- Recherche (GET, lecture seule : OK en GET) ---
+$q = trim($_GET['q'] ?? '');
+$where = '';
+$params = [];
+if ($q !== '') {
+    $where = "WHERE nom LIKE :q OR prenom LIKE :q OR email LIKE :q";
+    $params[':q'] = "%$q%";
+}
+
+// --- Pagination : 5 par page ---
+$parPage = 5;
+$page = max(1, (int)($_GET['page'] ?? 1));
+$offset = ($page - 1) * $parPage;
+
+// Total pour les liens de pages
+$stmt = $pdo->prepare("SELECT COUNT(*) FROM etudiants $where");
+$stmt->execute($params);
+$total = (int)$stmt->fetchColumn();
+$pages = max(1, (int)ceil($total / $parPage));
+
+// Liste paginée + tri récent
+$sql = "SELECT * FROM etudiants $where ORDER BY date_inscription DESC LIMIT $parPage OFFSET $offset";
+$stmt = $pdo->prepare($sql);
+$stmt->execute($params);
+$etudiants = $stmt->fetchAll();
+?>
+
+<!-- Dans le HTML, au-dessus du tableau : -->
+<form method="GET" action="" class="actions">
+  <input type="search" name="q" value="<?= htmlspecialchars($q) ?>" placeholder="🔍 Rechercher nom, prénom, email...">
+  <button type="submit" class="btn btn-primary">Chercher</button>
+  <?php if ($q !== ''): ?><a href="index.php" class="btn btn-back">✖ Effacer</a><?php endif; ?>
+</form>
+
+<!-- Sous le tableau : liens de pages -->
+<div class="actions">
+  <?php for ($i = 1; $i <= $pages; $i++): ?>
+    <a href="?q=<?= urlencode($q) ?>&page=<?= $i ?>"
+       class="btn <?= $i === $page ? 'btn-primary' : 'btn-back' ?>"><?= $i ?></a>
+  <?php endfor; ?>
+  <span class="count"><?= $total ?> résultat(s)</span>
+</div>`}
+        />
+        <InfoBox type="tip" title="💡 Pourquoi comme ça ?">
+          <p>Recherche en <strong>GET</strong> = URL partageable/bookmarkable (lecture seule, pas de CSRF). Pagination côté SQL (LIMIT/OFFSET) = rapide même à 10 000 lignes. <code>htmlspecialchars($q)</code> anti-XSS + <code>urlencode</code> pour les liens.</p>
+        </InfoBox>
+      </section>
+
+      {/* Étape 10 */}
+      <section id="etape10">
+        <div className="flex items-start gap-4 mb-4">
+          <div className="step-number">10</div>
+          <div>
+            <h2 className="text-2xl font-bold">Connexion sécurisée — login / logout / sessions</h2>
+            <p style={{ color: "var(--text-secondary)" }}>Aucune app pro sans authentification : users + hash + sessions</p>
+          </div>
+        </div>
+        <CodeBlock
+          language="sql"
+          filename="Table users + compte admin"
+          code={`CREATE TABLE IF NOT EXISTS users (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  login VARCHAR(50) NOT NULL UNIQUE,
+  mot_de_passe VARCHAR(255) NOT NULL  -- hash, jamais en clair !
+);
+
+-- Mot de passe 'admin123' hashé avec password_hash() :
+-- $2y$10$... (génère-le via hash.php ci-dessous, puis colle le résultat)
+INSERT INTO users (login, mot_de_passe) VALUES
+('admin', '$2y$10$wH6R6bX5mX5mX5mX5mX5mOuQvQvQvQvQvQvQvQvQvQvQvQvQvQvQ');`}
+        />
+        <CodeBlock
+          language="php"
+          filename="hash.php — générer un hash (usage unique, à supprimer après)"
+          code={`<?php
+// Ouvre http://localhost/gestion-etudiants/hash.php, copie le hash dans le SQL ci-dessus
+echo password_hash('admin123', PASSWORD_DEFAULT);
+?>`}
+        />
+        <CodeBlock
+          language="php"
+          filename="login.php — connexion"
+          code={`<?php
+session_start();
+require_once 'connexion.php';
+
+// Déjà connecté ? → accueil
+if (!empty($_SESSION['user'])) { header("Location: index.php"); exit; }
+
+$erreur = "";
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $login = trim($_POST['login'] ?? '');
+    $mdp = $_POST['mot_de_passe'] ?? '';
+
+    $stmt = $pdo->prepare("SELECT * FROM users WHERE login = :login");
+    $stmt->execute([':login' => $login]);
+    $user = $stmt->fetch();
+
+    if ($user && password_verify($mdp, $user['mot_de_passe'])) {
+        session_regenerate_id(true);           // anti-fixation de session
+        $_SESSION['user'] = $user['login'];
+        $_SESSION['csrf'] = bin2hex(random_bytes(32));  // token CSRF (S5)
+        header("Location: index.php");
+        exit;
+    }
+    $erreur = "❌ Login ou mot de passe incorrect.";
+}
+?>
+<!DOCTYPE html>
+<html lang="fr">
+<head><meta charset="UTF-8"><title>Connexion</title><link rel="stylesheet" href="style.css"></head>
+<body><div class="container" style="max-width:480px">
+  <header><h1>🔐 Connexion</h1></header>
+  <?php if ($erreur): ?><div class="alert error"><?= $erreur ?></div><?php endif; ?>
+  <form method="POST" class="form-card">
+    <div class="form-group"><label>Login :</label><input type="text" name="login" required autofocus></div>
+    <div class="form-group"><label>Mot de passe :</label><input type="password" name="mot_de_passe" required></div>
+    <button class="btn btn-primary btn-full" type="submit">Se connecter</button>
+  </form>
+</div></body></html>`}
+        />
+        <CodeBlock
+          language="php"
+          filename="Protéger chaque page + logout.php"
+          code={`<?php
+// ⬆️ TOUT EN HAUT de index.php / ajouter.php / modifier.php / supprimer.php :
+session_start();
+if (empty($_SESSION['user'])) {
+    header("Location: login.php");
+    exit;
+}
+// Affiche dans le header : Connecté : <?= htmlspecialchars($_SESSION['user']) ?>
+
+// --- logout.php ---
+// <?php
+// session_start();
+// session_destroy();
+// header("Location: login.php");
+// exit;
+// ?>`}
+        />
+        <InfoBox type="warning" title="⚠️ Les 3 règles or du login">
+          <p>1) <strong>Jamais en clair</strong> : <code>password_hash / password_verify</code>. 2) <strong>Session après vérif</strong> + <code>session_regenerate_id</code>. 3) <strong>Toute page privée vérifie la session</strong> en 1re ligne, sinon porte ouverte.</p>
+        </InfoBox>
+      </section>
+
+      {/* Étape 11 */}
+      <section id="etape11">
+        <div className="flex items-start gap-4 mb-4">
+          <div className="step-number">11</div>
+          <div>
+            <h2 className="text-2xl font-bold">Dashboard stats + export CSV</h2>
+            <p style={{ color: "var(--text-secondary)" }}>Le « plus » qui impressionne en soutenance : chiffres + export</p>
+          </div>
+        </div>
+        <CodeBlock
+          language="php"
+          filename="stats.php — tableau de bord"
+          code={`<?php
+session_start();
+if (empty($_SESSION['user'])) { header("Location: login.php"); exit; }
+require_once 'connexion.php';
+
+$total = (int)$pdo->query("SELECT COUNT(*) FROM etudiants")->fetchColumn();
+$parFiliere = $pdo->query(
+  "SELECT filiere, COUNT(*) AS n FROM etudiants GROUP BY filiere ORDER BY n DESC"
+)->fetchAll();
+$derniers = $pdo->query(
+  "SELECT nom, prenom, date_inscription FROM etudiants ORDER BY date_inscription DESC LIMIT 5"
+)->fetchAll();
+?>
+<!DOCTYPE html>
+<html lang="fr">
+<head><meta charset="UTF-8"><title>Stats</title><link rel="stylesheet" href="style.css"></head>
+<body><div class="container">
+  <header><h1>📊 Statistiques</h1><a href="index.php" class="btn btn-back">← Liste</a></header>
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-3" style="display:grid">
+    <div class="p-3 rounded-xl" style="background:var(--bg-primary);border:1px solid var(--border-color)">
+      <p style="font-size:2rem;font-weight:800"><?= $total ?></p><p>Total étudiants</p>
+    </div>
+    <?php foreach ($parFiliere as $f): ?>
+      <div class="p-3 rounded-xl" style="background:var(--bg-primary);border:1px solid var(--border-color)">
+        <p style="font-size:2rem;font-weight:800"><?= $f['n'] ?></p><p><?= htmlspecialchars($f['filiere']) ?></p>
+      </div>
+    <?php endforeach; ?>
+  </div>
+  <div class="actions" style="margin-top:20px">
+    <a href="export.php" class="btn btn-primary">📤 Exporter en CSV</a>
+  </div>
+</div></body></html>`}
+        />
+        <CodeBlock
+          language="php"
+          filename="export.php — téléchargement CSV (Excel)"
+          code={`<?php
+session_start();
+if (empty($_SESSION['user'])) { header("Location: login.php"); exit; }
+require_once 'connexion.php';
+
+header('Content-Type: text/csv; charset=utf-8');
+header('Content-Disposition: attachment; filename=etudiants.csv');
+
+$out = fopen('php://output', 'w');
+fputcsv($out, ['ID', 'Nom', 'Prenom', 'Email', 'Filiere', 'Date'], ';');
+foreach ($pdo->query("SELECT * FROM etudiants ORDER BY id") as $e) {
+    fputcsv($out, [$e['id'], $e['nom'], $e['prenom'], $e['email'], $e['filiere'], $e['date_inscription']], ';');
+}
+fclose($out);
+exit;
+?>`}
+        />
+      </section>
+
+      {/* Étape 12 */}
+      <section id="etape12">
+        <div className="flex items-start gap-4 mb-4">
+          <div className="step-number">12</div>
+          <div>
+            <h2 className="text-2xl font-bold">Finition pro : architecture, tests, mise en ligne, soutenance</h2>
+            <p style={{ color: "var(--text-secondary)" }}>Ce qui sépare un exercice d'un vrai projet : ranger, tester, déployer, présenter</p>
+          </div>
+        </div>
+        <div className="schema-box text-left">
+          <h4 className="font-bold mb-3 text-center">📁 Architecture finale conseillée</h4>
+          <div className="font-mono text-sm space-y-1 max-w-md mx-auto">
+            <p>📂 gestion-etudiants/</p>
+            <p className="ml-6">📄 index.php / ajouter.php / modifier.php / supprimer.php</p>
+            <p className="ml-6">📄 login.php / logout.php / stats.php / export.php</p>
+            <p className="ml-6">📄 connexion.php <span className="text-xs" style={{ color: "var(--text-secondary)" }}>← require_once partout</span></p>
+            <p className="ml-6">📄 style.css / script.js — 📄 hash.php <span className="text-xs" style={{ color: "var(--text-secondary)" }}>← à supprimer après usage</span></p>
+          </div>
+        </div>
+        <div className="p-5 rounded-2xl mt-4" style={{ background: "var(--bg-secondary)", border: "1px solid var(--border-color)" }}>
+          <h3 className="font-bold mb-2">🧪 Checklist de tests (à cocher avant soutenance) :</h3>
+          <ul className="text-sm space-y-1" style={{ color: "var(--text-secondary)" }}>
+            <li>☐ Sans login → <code>index.php</code> redirige vers <code>login.php</code> ; logout déconnecte</li>
+            <li>☐ Ajout OK + email dupliqué refusé ; XSS <code>&lt;script&gt;</code> affiché en texte (pas exécuté)</li>
+            <li>☐ Recherche « mar » + pagination page 2 + compteur cohérents</li>
+            <li>☐ Modification + suppression (+ confirm JS) + messages <code>?message=</code></li>
+            <li>☐ Stats + export CSV s'ouvre dans Excel ; sauvegarde <code>.sql</code> faite</li>
+            <li>☐ Mobile : tableau lisible, formulaire utilisable (voir responsive S8)</li>
+          </ul>
+        </div>
+        <InfoBox type="info" title="🚀 Mise en ligne (après le local)">
+          <p>1) Exporte la BDD (phpMyAdmin → Exporter). 2) Prends un hébergeur PHP/MySQL (ex. offre gratuite d'essai). 3) Envoie les fichiers par FTP, importe le <code>.sql</code>, adapte <code>connexion.php</code> (host/login/mdp fournis). 4) Passe en HTTPS + supprime <code>hash.php</code>. Le local XAMPP reste ton atelier, l'hébergeur = la vitrine.</p>
+        </InfoBox>
+        <div className="p-5 rounded-2xl mt-4" style={{ background: "linear-gradient(135deg, #3b82f620, #8b5cf620)", border: "1px solid var(--accent)" }}>
+          <h3 className="font-bold mb-2">🎓 Grille S12 /20 + soutenance 10 min :</h3>
+          <ul className="text-sm space-y-1" style={{ color: "var(--text-secondary)" }}>
+            <li>• Fonctionnel CRUD + recherche + pagination : <strong>6 pts</strong> • Login/sessions/hash : <strong>4 pts</strong></li>
+            <li>• Sécurité (XSS/SQLi/CSRF expliqués + checklist S5) : <strong>4 pts</strong> • Stats/export + code propre : <strong>3 pts</strong> • Présentation + tests : <strong>3 pts</strong></li>
+            <li>• Bonus : POST/CSRF sur suppression, responsive soigné, mise en ligne réelle</li>
+          </ul>
+        </div>
+      </section>
+
       {/* Résultat final */}
       <div className="p-8 rounded-2xl text-center" style={{ background: "linear-gradient(135deg, #22c55e20, #3b82f620)", border: "2px solid var(--success)" }}>
         <span className="text-6xl">🎉</span>
@@ -831,14 +1122,11 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
       </div>
 
-      <InfoBox type="tip" title="🚀 Pour aller plus loin">
+      <InfoBox type="tip" title="🚀 Et après ? Débouchés web">
         <p>
-          Améliorez votre projet avec :<br/>
-          • 🔍 Recherche d'étudiants<br/>
-          • 📄 Pagination<br/>
-          • 🔐 Système de connexion (login/mot de passe)<br/>
-          • 📊 Statistiques (nombre par filière)<br/>
-          • 📤 Export en CSV/PDF
+          Avec ce projet tu maîtrises le socle <strong>full-stack classique</strong> :<br/>
+          • 🖥️ Frontend : HTML/CSS/JS + fetch • 🐘 Backend : PHP/sessions/PDO • 🗄️ BDD : MySQL/jointures/export<br/>
+          Suites naturelles : framework PHP (Laravel), JavaScript moderne (React — comme ce site !), API REST/JSON, Git, Linux/Nginx, RGPD & sauvegardes.
         </p>
       </InfoBox>
     </div>

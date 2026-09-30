@@ -1,7 +1,10 @@
 import { useState, useEffect, useCallback } from "react";
-import { Menu, X, Sun, Moon, ChevronLeft, ChevronRight, GraduationCap } from "lucide-react";
+import { Menu, X, Sun, Moon, ChevronLeft, ChevronRight, GraduationCap, Printer, Search, Check } from "lucide-react";
 import { chapters } from "./data/chapters";
 import Accueil from "./chapters/Accueil";
+import ReseauxOSI from "./chapters/ReseauxOSI";
+import NiveauxWeb from "./chapters/NiveauxWeb";
+import SecuriteWeb from "./chapters/SecuriteWeb";
 import IntroTheorie from "./chapters/IntroTheorie";
 import InstallXampp from "./chapters/InstallXampp";
 import ChapitreHTML from "./chapters/ChapitreHTML";
@@ -10,9 +13,13 @@ import ChapitreJS from "./chapters/ChapitreJS";
 import ChapitrePHP from "./chapters/ChapitrePHP";
 import ChapitreMySQL from "./chapters/ChapitreMySQL";
 import ProjetFinal from "./chapters/ProjetFinal";
+import ProjetPython from "./chapters/ProjetPython";
 
 const chapterComponents: Record<string, React.FC> = {
   accueil: Accueil,
+  reseaux: ReseauxOSI,
+  niveaux: NiveauxWeb,
+  securite: SecuriteWeb,
   intro: IntroTheorie,
   xampp: InstallXampp,
   html: ChapitreHTML,
@@ -21,12 +28,14 @@ const chapterComponents: Record<string, React.FC> = {
   php: ChapitrePHP,
   mysql: ChapitreMySQL,
   projet: ProjetFinal,
+  python: ProjetPython,
 };
 
 export default function App() {
   const [currentChapter, setCurrentChapter] = useState("accueil");
   const [darkMode, setDarkMode] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [search, setSearch] = useState("");
   const [completedChapters, setCompletedChapters] = useState<Set<string>>(() => {
     try {
       const saved = localStorage.getItem("completedChapters");
@@ -49,13 +58,20 @@ export default function App() {
   }, [currentChapter]);
 
   const navigateTo = useCallback((chapterId: string) => {
-    // Mark previous chapter as completed
+    // La progression est manuelle (bouton "Marquer comme terminé") : pas d'auto-validation
+    setCurrentChapter(chapterId);
+    setSidebarOpen(false);
+  }, []);
+
+  const markCompleted = useCallback(() => {
     if (currentChapter !== "accueil") {
       setCompletedChapters((prev) => new Set([...prev, currentChapter]));
     }
-    setCurrentChapter(chapterId);
-    setSidebarOpen(false);
   }, [currentChapter]);
+
+  const filteredChapters = chapters.filter((c) =>
+    c.title.toLowerCase().includes(search.toLowerCase())
+  );
 
   const currentIndex = chapters.findIndex((c) => c.id === currentChapter);
   const prevChapter = currentIndex > 0 ? chapters[currentIndex - 1] : null;
@@ -88,7 +104,7 @@ export default function App() {
               <p className="text-xs" style={{ color: "var(--text-secondary)" }}>TP Complet</p>
             </div>
           </div>
-          <button className="md:hidden p-1" onClick={() => setSidebarOpen(false)}>
+          <button className="md:hidden p-1" onClick={() => setSidebarOpen(false)} aria-label="Fermer le menu">
             <X size={20} />
           </button>
         </div>
@@ -105,8 +121,21 @@ export default function App() {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 overflow-y-auto py-2">
-          {chapters.map((ch, i) => (
+        <nav className="flex-1 overflow-y-auto py-2" aria-label="Chapitres du cours">
+          <div className="px-5 pb-2">
+            <div className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm" style={{ background: "var(--bg-primary)", border: "1px solid var(--border-color)" }}>
+              <Search size={16} style={{ color: "var(--text-secondary)" }} />
+              <input
+                type="search"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Rechercher un chapitre…"
+                aria-label="Rechercher un chapitre"
+                className="bg-transparent outline-none flex-1 text-sm"
+              />
+            </div>
+          </div>
+          {filteredChapters.map((ch, i) => (
             <button
               key={ch.id}
               onClick={() => navigateTo(ch.id)}
@@ -145,7 +174,7 @@ export default function App() {
           style={{ background: "var(--bg-primary)ee", borderBottom: "1px solid var(--border-color)" }}
         >
           <div className="flex items-center gap-3">
-            <button className="md:hidden p-2 rounded-lg" style={{ background: "var(--bg-secondary)" }} onClick={() => setSidebarOpen(true)}>
+            <button className="md:hidden p-2 rounded-lg no-print" style={{ background: "var(--bg-secondary)" }} onClick={() => setSidebarOpen(true)} aria-label="Ouvrir le menu">
               <Menu size={20} />
             </button>
             <div>
@@ -157,7 +186,15 @@ export default function App() {
               </h1>
             </div>
           </div>
-          <div className="hidden md:flex items-center gap-4">
+          <div className="hidden md:flex items-center gap-4 no-print">
+            <button
+              onClick={() => window.print()}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all hover:opacity-80"
+              style={{ background: "var(--bg-secondary)", border: "1px solid var(--border-color)" }}
+              aria-label="Imprimer ou exporter le chapitre en PDF"
+            >
+              <Printer size={16} /> Imprimer / PDF
+            </button>
             <div className="flex items-center gap-2 text-sm" style={{ color: "var(--text-secondary)" }}>
               <div className="w-2 h-2 rounded-full bg-green-500" />
               {completedChapters.size}/{chapters.length - 1} complétés
@@ -168,6 +205,26 @@ export default function App() {
         {/* Content */}
         <div className="max-w-4xl mx-auto px-4 md:px-8 py-8">
           <CurrentComponent />
+
+          {/* Validation manuelle de progression */}
+          {currentChapter !== "accueil" && (
+            <div className="text-center mt-12 no-print">
+              {completedChapters.has(currentChapter) ? (
+                <p className="inline-flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-semibold" style={{ background: "#dcfce7", color: "#166534", border: "1px solid #86efac" }}>
+                  <Check size={18} /> Chapitre terminé ✓ — passez au suivant !
+                </p>
+              ) : (
+                <button
+                  onClick={markCompleted}
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-white transition-all hover:opacity-90"
+                  style={{ background: "linear-gradient(135deg, #22c55e, #16a34a)" }}
+                  aria-label="Marquer ce chapitre comme terminé"
+                >
+                  <Check size={18} /> J'ai terminé ce chapitre (quiz ≥ 60% conseillé)
+                </button>
+              )}
+            </div>
+          )}
 
           {/* Navigation bottom */}
           <div className="flex items-center justify-between mt-12 pt-6" style={{ borderTop: "1px solid var(--border-color)" }}>

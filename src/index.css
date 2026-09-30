@@ -255,3 +255,26 @@ pre code {
   color: white;
   border-color: var(--accent);
 }
+
+@media print {
+  aside, header, .no-print {
+    display: none !important;
+  }
+  main {
+    width: 100% !important;
+  }
+  body, .fade-in {
+    background: white !important;
+    color: black !important;
+  }
+  .fade-in {
+    animation: none !important;
+  }
+  .code-block {
+    break-inside: avoid;
+    box-shadow: none !important;
+  }
+  section {
+    break-inside: avoid-page;
+  }
+}
